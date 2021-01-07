@@ -1,0 +1,45 @@
+body {
+    background-color: slategrey;
+    color:white;
+    font-family: ;}
+
+p {
+    border: 2px solid #b0e0e6;
+}
+
+#main {
+    margin-left: 144px;
+    padding-left: 20px;
+}
+
+.sidebar {h
+    height: auto;
+    width: 144px;
+    background-color:#5f5f5f;
+    position: fixed !important;
+    z-index: 1;
+    overflow: auto;
+}
+
+.nodeselectactive {
+    height: 50px;
+    width: 100%;
+    background-color: skyblue;
+}
+
+.nodeselectonline {
+    height: 20px;
+    width: 100%;
+    border-style: none none none solid;
+    border-color: springgreen;
+    background: transparent;
+}
+
+.nodeselectoffline {
+    height: 50px;
+    width: 100%;
+    border-style: none none none solid;
+    border-color: lightcoral;
+    background: transparent;
+}
+
