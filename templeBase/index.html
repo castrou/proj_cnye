@@ -1,32 +1,24 @@
 <!DOCTYPE html>
 <html>
-<link rel="stylesheet" href="styles.css">
-<head>
-    <meta charset="UTF-8">
-    <title>Cameron is the Greatest</title>
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
-</head>
+    <link rel="stylesheet" href="styles.css" />
+    <head>
+        <meta charset="UTF-8" />
+        <title>Cameron is the Greatest</title>
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="script-src 'self' 'unsafe-inline';"
+        />
+    </head>
 
-<body>
-    <div class="sidebar">
-        <button class="nodeselectoffline">Rat</button>
-        <button class="nodeselectoffline">Ox</button> 
-        <button class="nodeselectoffline">Tiger</button> 
-        <button class="nodeselectoffline">Rabbit</button> 
-        <button class="nodeselectoffline">Dragon</button> 
-        <button class="nodeselectoffline">Snake</button> 
-        <button class="nodeselectoffline">Horse</button> 
-        <button class="nodeselectoffline">Sheep</button> 
-        <button class="nodeselectoffline">Monkey</button> 
-        <button class="nodeselectoffline">Rooster</button> 
-        <button class="nodeselectoffline">Dog</button> 
-        <button class="nodeselectoffline">Pig</button> 
-    </div>
-    <div id='main'>
-    <h1>Hello World!</h1>
-    <p>
-        <button>Test</button>
-    </p>
-    </div>
-</body>
-</html> 
+    <body>
+        <p id="activeSign"></p>
+        <div class="sidebar" id="zodiac-button-wrap"></div>
+        <div id="main">
+            <h1>Hello World!</h1>
+            <p>
+                <button>Test</button>
+            </p>
+        </div>
+        <script src="./app.js"></script>
+    </body>
+</html>
