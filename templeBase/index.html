@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-    <link rel="stylesheet" href="styles.css" />
     <head>
         <meta charset="UTF-8" />
         <title>Cameron is the Greatest</title>
@@ -8,16 +7,28 @@
             http-equiv="Content-Security-Policy"
             content="script-src 'self' 'unsafe-inline';"
         />
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap"
+            rel="stylesheet"
+        />
+        <link rel="stylesheet" href="styles.css" />
     </head>
 
     <body>
-        <p id="activeSign"></p>
-        <div class="sidebar" id="zodiac-button-wrap"></div>
-        <div id="main">
-            <h1>Hello World!</h1>
-            <p>
-                <button>Test</button>
-            </p>
+        <div class="header">
+            <code>PROJ_CNYE</code>
+            <div class="btn-group">
+                <button>ALL ON</button>
+                <button>ALL OFF</button>
+            </div>
+        </div>
+        <div class="content">
+            <div class="sidebar" id="zodiac-button-wrap"></div>
+            <div id="main">
+                <h2>Active Signs</h2>
+                <ul id="activeSign"></ul>
+            </div>
         </div>
         <script src="./app.js"></script>
     </body>
