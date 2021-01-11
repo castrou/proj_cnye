@@ -1,38 +1,63 @@
-const { STATUS_CLASSES } = require('./types')
+const { buttonStyles } = require("./types");
 class ZodiacSign {
     sign = "";
-    active = false;
+    isActive = false;
     node;
-    constructor(sign) {
+    uiNode;
+    constructor(sign, uiNode) {
         this.sign = sign;
-        this.active = false;
+        this.isActive = false;
         const button = document.createElement("button");
         button.onclick = function () {
             ipcRenderer.send("zodiac-clicked", sign);
             button.setAttribute("disabled", true);
-            button.classList.add(STATUS_CLASSES.nodeselect.loading);
+            button.classList.add(buttonStyles.loading);
         };
         button.innerText = sign;
-        button.classList.add(STATUS_CLASSES.nodeselect.root);
-        button.classList.add(STATUS_CLASSES.nodeselect.offline);
+        button.classList.add(buttonStyles.root);
+        button.classList.add(buttonStyles.offline);
         button.id = `node-${sign}`;
+        this.uiNode = uiNode;
         this.node = button;
     }
-    get isActive() {
-        return this.active;
+    turnOn() {
+        swapClass(this.node, buttonStyles.offline, buttonStyles.online);
+        swapClass(this.uiNode, 'disappear', 'appear')
+    }
+    turnOff() {
+        swapClass(this.node, buttonStyles.online, buttonStyles.offline);
+        swapClass(this.uiNode, 'appear', 'disappear')
     }
     toggleActive() {
-        this.active = !this.active;
-        this.node.classList.remove(STATUS_CLASSES.nodeselect.loading);
+        this.isActive = !this.isActive;
+        this.node.classList.remove(buttonStyles.loading);
         this.node.removeAttribute("disabled");
-        if (this.active) {
-            this.node.classList.add(STATUS_CLASSES.nodeselect.online);
-            this.node.classList.remove(STATUS_CLASSES.nodeselect.offline);
+
+        if (this.isActive) {
+            this.turnOff()
         } else {
-            this.node.classList.add(STATUS_CLASSES.nodeselect.offline);
-            this.node.classList.remove(STATUS_CLASSES.nodeselect.online);
+            this.turnOn()
         }
+
         return this;
     }
 }
-module.exports = ZodiacSign
+module.exports = ZodiacSign;
+const swapClass = (element, addClass, removeClass) => {
+    if (addClass instanceof Array) {
+        element.classList.add(...addClass);
+    } else if (typeof addClass === 'string') {
+        element.classList.add(addClass);
+    } else {
+        throw new Error(`addClass must be either an array or a string.
+        received ${addClass} instead`);
+    }
+    if (removeClass instanceof Array) {
+        element.classList.remove(...removeClass);
+    } else if (typeof removeClass === 'string') {
+        element.classList.remove(removeClass);
+    } else {
+        throw new Error(`removeClass must be either an array or a string
+        received ${removeClass} instead`);
+    }
+};

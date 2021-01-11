@@ -12,15 +12,13 @@ const signs = [
     "Dog",
     "Pig",
 ];
-const STATUS_CLASSES = {
-    nodeselect: {
-        root: "nodeselect",
-        offline: "offline",
-        online: "online",
-        loading: "loading",
-    },
+const buttonStyles  = {
+    root: "nodeselect",
+    offline: "offline",
+    online: "online",
+    loading: "loading",
 };
 module.exports = {
-	signs,
-	STATUS_CLASSES
+    signs,
+    buttonStyles
 }
