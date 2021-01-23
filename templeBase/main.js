@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
+const ipcMainHandlers = require('./ipcMainHandlers')
 
 let win;
 function createWindow() {
@@ -19,29 +20,11 @@ app.on("window-all-closed", () => {
         app.quit();
     }
 });
-// todo: move this to api.js
-async function apiToggleSign(sign) {
-	// temporary filler async thing
-	const seconds = Math.random() * 2
-	return new Promise((resolve) => {
-		setTimeout(() => {
-			resolve(true)
-		}, seconds * 1000)
-	})
-}
-ipcMain.on('zodiac-clicked', (event, sign) => {
-	// this is where we send a message to the thing to do an async
-	// request to toggle the light
-	apiToggleSign(sign).then(() => {
-		event.reply('registered-zodiac-click', {
-			success: true,
-			sign
-		})
-	}).catch(err => {
-	})
+
+// register handlers
+Object.values(ipcMainHandlers).forEach(event => {
+	ipcMain.on(event.name, event.handler)
 })
-
-
 
 app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {

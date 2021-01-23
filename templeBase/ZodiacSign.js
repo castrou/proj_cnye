@@ -1,3 +1,10 @@
+const { ipcRenderer } = require("electron");
+const {
+    REGISTER_ZODIAC_ON,
+    ZODIAC_SWITCH_ON,
+    REGISTER_ZODIAC_OFF,
+    ZODIAC_SWITCH_OFF,
+} = require("./events");
 const { buttonStyles } = require("./types");
 class ZodiacSign {
     sign = "";
@@ -8,10 +15,22 @@ class ZodiacSign {
         this.sign = sign;
         this.isActive = false;
         const button = document.createElement("button");
-        button.onclick = function () {
-            ipcRenderer.send("zodiac-clicked", sign);
-            button.setAttribute("disabled", true);
-            button.classList.add(buttonStyles.loading);
+        ipcRenderer.on(REGISTER_ZODIAC_OFF(sign), (event, arg) => {
+            if (arg.success) {
+                this.toggleUIActive();
+            } else {
+                console.log("error", arg.error);
+            }
+        });
+        ipcRenderer.on(REGISTER_ZODIAC_ON(sign), (event, arg) => {
+            if (arg.success) {
+                this.toggleUIActive();
+            } else {
+                console.log("error", arg.error);
+            }
+        });
+        button.onclick = () => {
+            this.sendSwitchEvent();
         };
         button.innerText = sign;
         button.classList.add(buttonStyles.root);
@@ -20,23 +39,38 @@ class ZodiacSign {
         this.uiNode = uiNode;
         this.node = button;
     }
-    turnOn() {
+    sendSwitchEvent() {
+        this.node.setAttribute("disabled", true);
+        this.node.classList.add(buttonStyles.loading);
+        if (this.isActive) {
+            this.sendSwitchOff();
+        } else {
+            this.sendSwitchOn();
+        }
+    }
+    sendSwitchOn() {
+        ipcRenderer.send(ZODIAC_SWITCH_ON, this.sign);
+    }
+    sendSwitchOff() {
+        ipcRenderer.send(ZODIAC_SWITCH_OFF, this.sign);
+    }
+    toggleUIOn() {
         swapClass(this.node, buttonStyles.offline, buttonStyles.online);
-        swapClass(this.uiNode, 'disappear', 'appear')
+        swapClass(this.uiNode, "disappear", "appear");
     }
-    turnOff() {
+    toggleUIOff() {
         swapClass(this.node, buttonStyles.online, buttonStyles.offline);
-        swapClass(this.uiNode, 'appear', 'disappear')
+        swapClass(this.uiNode, "appear", "disappear");
     }
-    toggleActive() {
+    toggleUIActive() {
         this.isActive = !this.isActive;
         this.node.classList.remove(buttonStyles.loading);
         this.node.removeAttribute("disabled");
 
         if (this.isActive) {
-            this.turnOff()
+            this.toggleUIOff();
         } else {
-            this.turnOn()
+            this.toggleUIOn();
         }
 
         return this;
@@ -46,7 +80,7 @@ module.exports = ZodiacSign;
 const swapClass = (element, addClass, removeClass) => {
     if (addClass instanceof Array) {
         element.classList.add(...addClass);
-    } else if (typeof addClass === 'string') {
+    } else if (typeof addClass === "string") {
         element.classList.add(addClass);
     } else {
         throw new Error(`addClass must be either an array or a string.
@@ -54,7 +88,7 @@ const swapClass = (element, addClass, removeClass) => {
     }
     if (removeClass instanceof Array) {
         element.classList.remove(...removeClass);
-    } else if (typeof removeClass === 'string') {
+    } else if (typeof removeClass === "string") {
         element.classList.remove(removeClass);
     } else {
         throw new Error(`removeClass must be either an array or a string
