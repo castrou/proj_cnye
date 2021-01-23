@@ -1,64 +1,46 @@
-const { ipcRenderer } = require("electron");
-const {
-    REGISTER_ZODIAC_ON,
-    ZODIAC_SWITCH_ON,
-    REGISTER_ZODIAC_OFF,
-    ZODIAC_SWITCH_OFF,
-} = require("./events");
-const { buttonStyles } = require("./types");
+const { REGISTER_ZODIAC_ON, REGISTER_ZODIAC_OFF } = require("../events");
+const { buttonStyles } = require("../types");
+
 class ZodiacSign {
     sign = "";
     isActive = false;
     node;
     uiNode;
-    constructor(sign, uiNode) {
+    ipcHandler;
+    constructor(sign, uiNode, buttonNode, ipcHandler) {
         this.sign = sign;
         this.isActive = false;
-        const button = document.createElement("button");
-        ipcRenderer.on(REGISTER_ZODIAC_OFF(sign), (event, arg) => {
-            if (arg.success) {
-                this.toggleUIActive();
-            } else {
-                console.log("error", arg.error);
-            }
-        });
-        ipcRenderer.on(REGISTER_ZODIAC_ON(sign), (event, arg) => {
-            if (arg.success) {
-                this.toggleUIActive();
-            } else {
-                console.log("error", arg.error);
-            }
-        });
-        button.onclick = () => {
-            this.sendSwitchEvent();
-        };
-        button.innerText = sign;
-        button.classList.add(buttonStyles.root);
-        button.classList.add(buttonStyles.offline);
-        button.id = `node-${sign}`;
+        this.ipcHandler = ipcHandler 
         this.uiNode = uiNode;
-        this.node = button;
+        this.node = buttonNode;
+        this.node.onclick = () => {
+            this.sendSwitchEvent()
+        }
     }
     sendSwitchEvent() {
         this.node.setAttribute("disabled", true);
         this.node.classList.add(buttonStyles.loading);
         if (this.isActive) {
-            this.sendSwitchOff();
+            this.ipcHandler.sendSwitchOff();
         } else {
-            this.sendSwitchOn();
+            this.ipcHandler.sendSwitchOn();
         }
     }
-    sendSwitchOn() {
-        ipcRenderer.send(ZODIAC_SWITCH_ON, this.sign);
+    setUILoading() {
+        this.node.setAttribute("disabled", true);
+        this.node.classList.add(buttonStyles.loading);
     }
-    sendSwitchOff() {
-        ipcRenderer.send(ZODIAC_SWITCH_OFF, this.sign);
-    }
-    toggleUIOn() {
+    toggleUIOff() {
+        this.isActive = !this.isActive;
+        this.node.classList.remove(buttonStyles.loading);
+        this.node.removeAttribute("disabled");
         swapClass(this.node, buttonStyles.offline, buttonStyles.online);
         swapClass(this.uiNode, "disappear", "appear");
     }
-    toggleUIOff() {
+    toggleUIOn() {
+        this.isActive = !this.isActive;
+        this.node.classList.remove(buttonStyles.loading);
+        this.node.removeAttribute("disabled");
         swapClass(this.node, buttonStyles.online, buttonStyles.offline);
         swapClass(this.uiNode, "appear", "disappear");
     }
@@ -72,7 +54,6 @@ class ZodiacSign {
         } else {
             this.toggleUIOn();
         }
-
         return this;
     }
 }

@@ -29,5 +29,5 @@ const SWITCH_OFF = {
 }
 module.exports = {
 	SWITCH_ON,
-	SWITCH_OFF
+	SWITCH_OFF,
 }

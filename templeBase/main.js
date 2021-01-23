@@ -1,5 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
-const ipcMainHandlers = require('./ipcMainHandlers')
+const ipcMainHandlers = require('./src/ipcMainHandlers')
 
 let win;
 function createWindow() {
