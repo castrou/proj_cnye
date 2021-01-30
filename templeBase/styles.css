@@ -105,7 +105,7 @@ li.ui-node.disappear {
     margin: 0 26px;
 }
 .nodeselect:active {
-    background-color: skyblue;
+    /* background-color: skyblue; */
 }
 .nodeselect:focus {
     outline: none;
@@ -138,3 +138,45 @@ li.ui-node.disappear {
     border-color: #f5b055;
     cursor: progress;
 }
+.colorset {
+    display: none;
+    background-color: #4d4d4d;
+    padding: 5px;
+    border-radius: 12.5px;
+    box-shadow: 0px 3px 8px 1px #272727;
+}
+.nodeselect:hover .colorset{
+    display: block;
+    position: relative;
+    transform: translate(80px, -50px);
+    width: 20px;
+}
+
+.colorset .color {
+    height: 40px;
+    width: 30px;
+    border-radius: 10px;
+    transition: width 0.1s ease-out;
+}
+.color:hover {
+    width: 90px;
+}
+.color:hover :after {
+    display: block;
+}
+.color:after {
+    display: none;
+}
+.colorset {
+    cursor: auto;
+}
+.color {
+    cursor: pointer;
+}
+.colorset .color:not(:last-child) {
+    margin-bottom: 20px;
+}
+.color.blue { background-color: #26B7F5; }
+.color.red { background-color: #EF5151; }
+.color.yellow { background-color: #f5b055; }
+.color.green { background-color: #5AB774; }
