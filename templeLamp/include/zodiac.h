@@ -1,0 +1,14 @@
+typedef enum Zodiac_t {
+	ZOD_OX,
+	ZOD_TIGER,
+	ZOD_RABBIT,
+	ZOD_DRAGON,
+	ZOD_SNAKE,
+	ZOD_HORSE,
+	ZOD_GOAT,
+	ZOD_MONKE,
+	ZOD_COCK,
+	ZOD_DOG,
+	ZOD_PIG,
+	ZOD_RAT,
+} Zodiac_t;
