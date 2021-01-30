@@ -5,6 +5,7 @@ const {
     createButtonElement,
 } = require("./src/zodiac/elements");
 const { IPCRenderHandler, handlers } = require("./src/zodiac/ipcRenderer");
+const { REGISTER_ON, REGISTER_OFF, REGISTER_COLOR_SET } = handlers
 
 let state = {};
 let wrap;
@@ -28,7 +29,6 @@ const loadZodiacButtons = () => {
             buttonElement,
             ipcHandler
         )
-        const { REGISTER_ON, REGISTER_OFF } = handlers
 
         const registerOnEvent = REGISTER_ON.makeName(sign)
         const registerOnHandler = REGISTER_ON.makeHandler(() => {
@@ -39,8 +39,14 @@ const loadZodiacButtons = () => {
             zodiacSign.toggleUIOff()
         })
 
+        const regsiterColorEvent = REGISTER_COLOR_SET.makeName(sign)
+        const registerColorHandler = REGISTER_COLOR_SET.makeHandler((args) => {
+            zodiacSign.setColor(args.color)
+        })
+
         zodiacSign.ipcHandler.registerHandler(registerOnEvent, registerOnHandler)
         zodiacSign.ipcHandler.registerHandler(registerOffEvent, registerOffHandler)
+        zodiacSign.ipcHandler.registerHandler(regsiterColorEvent, registerColorHandler)
 
         state[sign] = zodiacSign;
 
