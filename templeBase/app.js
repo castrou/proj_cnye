@@ -12,42 +12,37 @@ let wrap;
 let activeSignUI;
 
 const loadZodiacButtons = () => {
+    // wraps the buttons
     wrap = document.getElementById("zodiac-button-wrap");
+
+    // Active Indicators
     activeSignUI = document.getElementById("activeSign");
+
     const buttons = signs.map((sign) => {
-        // create activeSigns list
-
+        // Active Indicator for the zodiac sign
         const listElement = createListElement(sign);
-        const buttonElement = createButtonElement(sign);
-        const ipcHandler = new IPCRenderHandler(sign);
-
         activeSignUI.appendChild(listElement);
 
+        // Button element including color selection 
+        const buttonElement = createButtonElement(sign);
+
+        // Event handler
+        const ipcHandler = new IPCRenderHandler(sign);
+
+        // This class contains most of the logic
+        // of the app
         const zodiacSign = new ZodiacSign(
             sign,
             listElement,
             buttonElement,
             ipcHandler
         )
-
-        const registerOnEvent = REGISTER_ON.makeName(sign)
-        const registerOnHandler = REGISTER_ON.makeHandler(() => {
-            zodiacSign.toggleUIOn()
-        })
-        const registerOffEvent = REGISTER_OFF.makeName(sign)
-        const registerOffHandler = REGISTER_OFF.makeHandler(() => {
-            zodiacSign.toggleUIOff()
-        })
-
-        const regsiterColorEvent = REGISTER_COLOR_SET.makeName(sign)
-        const registerColorHandler = REGISTER_COLOR_SET.makeHandler((args) => {
-            zodiacSign.setColor(args.color)
-        })
-
-        zodiacSign.ipcHandler.registerHandler(registerOnEvent, registerOnHandler)
-        zodiacSign.ipcHandler.registerHandler(registerOffEvent, registerOffHandler)
-        zodiacSign.ipcHandler.registerHandler(regsiterColorEvent, registerColorHandler)
-
+        const events = [
+            {...REGISTER_ON, onSuccess: () => zodiacSign.toggleUIOn()},
+            {...REGISTER_OFF, onSuccess: () => zodiacSign.toggleUIOff()},
+            {...REGISTER_ON, onSuccess: (args) => zodiacSign.setColor(args.color)},
+        ]
+        registerIPCHandlerEvents(zodiacSign, events)
         state[sign] = zodiacSign;
 
         // create buttons
@@ -56,6 +51,15 @@ const loadZodiacButtons = () => {
     });
     return buttons;
 };
+const registerIPCHandlerEvents = (zodiacSign, events) => {
+    events.forEach(event => {
+        const { ipcHandler, sign } = zodiacSign;
+        const { onError, onSuccess } = event
+        const eventName = event.makeName(sign);
+        const eventHandler = event.makeHandler(onSuccess, onError)
+        ipcHandler.registerHandler(eventName, eventHandler)
+    })
+}
 
 function switchOnAll() {
     Object.values(state).forEach((horoscope) => {
