@@ -1,4 +1,9 @@
+#ifndef LAMP_H
+#define LAMP_H
+
+#include <WiFi.h>
 #include "IRremote.h"
+#include "../../include/zodiac.h"
 
 #define IR_PIN      5
 
@@ -30,7 +35,7 @@ typedef enum LedMode_t {
     LED_STROBE=0xF7F00F,
     LED_FADE=0xF7C837,
     LED_SMOOTH=0xF7E817,
-}
+} LedMode_t;
 
 class Lamp {
 	public:
@@ -48,3 +53,6 @@ class Lamp {
         IRsend irsend;
         // Private functions
 };
+
+
+#endif // LAMP_H
