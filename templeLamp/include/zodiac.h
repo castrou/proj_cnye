@@ -1,5 +1,8 @@
+#ifndef ZODIAC_H
+#define ZODIAC_H
+
 typedef enum Zodiac_t {
-	ZOD_OX,
+	ZOD_OX=1,
 	ZOD_TIGER,
 	ZOD_RABBIT,
 	ZOD_DRAGON,
@@ -12,3 +15,5 @@ typedef enum Zodiac_t {
 	ZOD_PIG,
 	ZOD_RAT,
 } Zodiac_t;
+
+#endif // ZODIAC_H
