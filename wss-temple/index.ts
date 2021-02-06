@@ -12,7 +12,7 @@ const server = createServer(app)
 
 app.use(express.json())
 
-app.put('/zodiac/:sign/:action', (req, res) => {
+app.put('/api/:sign/:action', (req, res) => {
 	const { sign, action } = req.params;
 	const parsedSign = sign.toUpperCase();
 	const parsedAction = action.toUpperCase();

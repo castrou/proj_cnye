@@ -22,6 +22,6 @@ class SocketHelper {
 		server.emit(emitEvent)
 	}
 }
-const PORT = +(process.env.WSS_PORT || 8090)
+const PORT = +(process.env.WSS_PORT || 8000)
 const socketHelper = new SocketHelper(PORT)
 export default socketHelper
