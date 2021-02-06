@@ -1,5 +1,5 @@
 import { computed, ref, defineComponent, PropType } from 'vue'
-import { ColorOption, Zodiac } from '../../types'
+import { ColorOption, colorSelectionOptions, Zodiac } from '../../types'
 import { apiHelper } from '../../services/axios.helper'
 import ColorSet from '../ColorSet.vue'
 const component = defineComponent({
@@ -14,7 +14,7 @@ const component = defineComponent({
 	},
 	setup(props) {
 		const lightOn = ref(false)
-		const color = ref('BLUE1')
+		const color = ref(colorSelectionOptions[0].option)
 		const menu = ref(false)
 
 		const buttonClasses = computed(() => {
@@ -29,16 +29,16 @@ const component = defineComponent({
 		}
 	},
 	methods: {
-		colorSelected(color: ColorOption) {
+		async colorSelected(color: ColorOption) {
 			if(!this.lightOn) {
 				this.lightOn = true;
 			}
 			this.color = color;
+			await apiHelper.sendCommand(this.zodiac.name, this.color)
 		},
 		async toggle() {
 			this.lightOn = !this.lightOn
-			const command = this.lightOn ? 'on' : 'off'
-			await apiHelper.sendCommand(this.zodiac.name, command)
+			await apiHelper.sendCommand(this.zodiac.name, this.color)
 		},
 		menuToggle() {
 			this.menu = !this.menu
