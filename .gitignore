@@ -1,1 +1,3 @@
 node_modules/
+wss-temple/dist/
+**/.env
