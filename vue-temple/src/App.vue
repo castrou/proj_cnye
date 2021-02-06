@@ -22,7 +22,7 @@ export default defineComponent({
   },
   data () {
     return {
-      zodiacs: zodiacs
+      zodiacs
     }
   }
 })

@@ -1,6 +1,6 @@
 import { computed, ref, defineComponent, PropType } from 'vue'
 import { Zodiac } from '../../types'
-import { socket } from '../../sockets/sockets.helper'
+import { apiHelper } from '../../services/axios.helper'
 const component = defineComponent({
 	props: {
 		zodiac: {
@@ -23,10 +23,10 @@ const component = defineComponent({
 		}
 	},
 	methods: {
-		toggle () {
+		async toggle() {
 			this.lightOn = !this.lightOn
-			const message = `${this.zodiac.name}/${this.lightOn ? 'on' : 'off'}`
-			socket.emitMessage(message)
+			const command = this.lightOn ? 'on' : 'off'
+			await apiHelper.sendCommand(this.zodiac.name, command)
 		}
 	}
 })
