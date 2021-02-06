@@ -3,7 +3,7 @@
 
 #include <WiFi.h>
 #include "IRremote.h"
-#include "../../include/zodiac.h"
+#include "zodiac.h"
 
 #define IR_PIN      5
 
@@ -25,7 +25,6 @@ typedef enum LedCol_t {
     LED_PINK=0xF76897,
 } LedCol_t;
 
- 
 typedef enum LedMode_t {
     LED_ON=0xF7C03F,
     LED_OFF=0xF740BF,
@@ -43,15 +42,18 @@ class Lamp {
         Lamp ();
         // Public Variables
 		WiFiClient client;
-		Zodiac_t zodiac;
+		Zodiac_t zodId;
         // Public functions
 		void led_set_col(LedCol_t colour);
         void led_mode(LedMode_t mode);
+        bool isMyZodiac(std::string zodString);
+        void process_cmd(std::string cmd);
 
 	private:
         // Private variables
         IRsend irsend;
         // Private functions
+        void process_col(std::string colCmd); // Must include "COLOR"
 };
 
 

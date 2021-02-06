@@ -29,12 +29,12 @@ void setup() {
 	delay(2000);
 	// Check EEPROM memory for zodiac
 	if ((eepVal = EEPROM.read(0)) >= ZOD_OX && eepVal <= ZOD_RAT) {
-		lamp.zodiac = (Zodiac_t) eepVal;
+		lamp.zodId = (Zodiac_t) eepVal;
 		Serial.print("Fetched zodiac: ");
 		Serial.println(eepVal);
 	} else {
-		lamp.zodiac = ZOD_OX;
-		EEPROM.write(0, lamp.zodiac);
+		lamp.zodId = ZOD_OX;
+		EEPROM.write(0, lamp.zodId);
 		EEPROM.commit();
 		Serial.println("Setting zodiac: OX");
 		Serial.println(eepVal);
@@ -58,17 +58,49 @@ void setup() {
 }
 
 void loop() {
+	std::string recv;
+	char c;
+	bool relevantRx;
 
-	if (status) {  
-		signal ^= 1;  
-		if (lamp.client.readBytes(recv, LINE_STR_SIZE)) {
-			Serial.println(recv);
+	if (status) {
+		// Reset
+		relevantRx = false;
+		recv.clear();
+
+		/* Get Zodiac */
+		while (lamp.client.available()) {
+			c = lamp.client.read(); // Get character from server->client buffer
+			Serial.print(c);		// Display
+			if (c == '\0') continue;	// Don't need no null term
+      		if (c != '\r' && c != '\n' && (c < 32)) continue; // or newline/return
+			if (c == '-') // Is our string the complete zodiac?
+				if (lamp.isMyZodiac(recv)) relevantRx = true; // is it our zod?
+				else relevantRx = false;	// no
+				break; // Move onto the command
+			recv.push_back(c); // append recv
+		}
+		recv.clear();
+
+		/* Get command */
+		if (relevantRx) {
+
+			while (lamp.client.available()) {
+				c = lamp.client.read();
+				Serial.print(c);
+				if (c == '\0') continue;	// Don't need no null term
+				if (c != '\r' && c != '\n' && (c < 32)) continue; // or newline/return
+			}
+			lamp.process_cmd(recv);
+
+		} else {
+			while (lamp.client.available())
+				c = lamp.client.read(); // Just clear until no longer available
 		}
 		
-		digitalWrite(LED_BUILTIN, signal);
+
+		digitalWrite(LED_BUILTIN, signal); // a lil heartbeat so we know it ok (probs delet for final)
 		delay(50);
 	}
-	Serial.print("Zodiac: ");
-	Serial.println(EEPROM.read(0));
+
 	delay(100);
 }
