@@ -1,5 +1,5 @@
 <template lang="pug">
-.bg-gray-800.p-10
+.bg-gray-800.p-10.min-h-screen
   .flex.flex-col.space-y-2
     ZodiacLight(
     v-for="(zodiac, index) in zodiacs" 
