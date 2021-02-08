@@ -21,6 +21,29 @@ IPAddress server(192,168,43,33);
 Lamp lamp;
 
 /* Functions */
+std::string client_read(WiFiClient *rxClient) {
+	
+	std::string rx;
+	char c;
+	rx.clear();
+
+	while (rxClient->connected()) {
+		do {
+			c = rxClient->read();
+			if (c == '\0') continue;
+			if (c >= 255) continue;
+			if (c != '\r' && c != '\n' && c < ((int) 32)) continue;
+			rx.push_back(c);
+		} while (c != '\n');
+
+		Serial.print("RECV: ");
+		Serial.println(rx.c_str());
+		break;
+	}
+
+	return rx;
+}
+
 void setup() {
 	// Begin functions
 	Serial.begin(9600);
@@ -41,7 +64,7 @@ void setup() {
 	}
 
 	// Initialisation
-	pinMode (LED_BUILTIN, OUTPUT);
+	pinMode (LED_BUILTIN, OUTPUT);			
 	
 	// Connect to wifi
 	while (WiFi.status() != WL_CONNECTED) {
@@ -69,35 +92,16 @@ void loop() {
 
 		/* Get Zodiac */
 		while (lamp.client.available()) {
-			c = lamp.client.read(); // Get character from server->client buffer
-			Serial.print(c);		// Display
-			if (c == '\0') continue;	// Don't need no null term
-      		if (c != '\r' && c != '\n' && (c < 32)) continue; // or newline/return
-			if (c == '-') // Is our string the complete zodiac?
-				if (lamp.isMyZodiac(recv)) relevantRx = true; // is it our zod?
-				else relevantRx = false;	// no
-				break; // Move onto the command
-			recv.push_back(c); // append recv
+			recv = client_read(&(lamp.client));
+			if (lamp.isMyZodiac(recv)) relevantRx = true; // is it our zod?
+			else relevantRx = false;	// no
 		}
-		recv.clear();
-
+		Serial.println(relevantRx);
 		/* Get command */
 		if (relevantRx) {
-
-			while (lamp.client.available()) {
-				c = lamp.client.read();
-				Serial.print(c);
-				if (c == '\0') continue;	// Don't need no null term
-				if (c != '\r' && c != '\n' && (c < 32)) continue; // or newline/return
-			}
 			lamp.process_cmd(recv);
-
-		} else {
-			while (lamp.client.available())
-				c = lamp.client.read(); // Just clear until no longer available
 		}
 		
-
 		digitalWrite(LED_BUILTIN, signal); // a lil heartbeat so we know it ok (probs delet for final)
 		delay(50);
 	}
