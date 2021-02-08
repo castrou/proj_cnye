@@ -31,6 +31,6 @@ class SocketHelper {
 		})
 	}
 }
-const PORT = +(process.env.WSS_PORT || 8000)
+const PORT = +(process.env.WSS_PORT || 42069)
 const socketHelper = new SocketHelper(PORT)
 export default socketHelper

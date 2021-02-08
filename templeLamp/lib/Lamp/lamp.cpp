@@ -1,20 +1,23 @@
 #include "lamp.h"
 #include "IRremote.h"
 
-#define CMD_CNT 9
-#define COL_CNT 15
+#define CMD_CNT 9       // Number of commands
+#define COL_CNT 15      // Number of colours
 
+/* Command string and IR signal pair */
 typedef struct Command {
     std::string cmd;
     LedMode_t irVal;
 } Command;
 
-typedef struct Color {
+/* Colour string and IR signal pair */
+typedef struct Colour {
     std::string col;
     LedCol_t irVal;
-} Color;
+} Colour;
 
-Color colors[COL_CNT] = {
+/* List of colour pairs */
+Colour colours[COL_CNT] = {
     {"RED", LED_RED},
     {"GREEN1", LED_GREEN1},
     {"BLUE1", LED_BLUE1},
@@ -32,8 +35,9 @@ Color colors[COL_CNT] = {
     {"PINK", LED_PINK},  
 };
 
+/* List of command pairs */
 Command commands[CMD_CNT] = {
-    {"COLOR",  (LedMode_t) 0},
+    {"COLOUR",  (LedMode_t) 0},
     {"ON",  LED_ON},
     {"OFF",  LED_OFF},
     {"SPEEDUP",  LED_SPEEDUP},
@@ -44,18 +48,31 @@ Command commands[CMD_CNT] = {
     {"SMOOTH",  LED_SMOOTH},
 };
 
+/* Lamp object constructor */
 Lamp::Lamp() { 
     irsend.timerPwmPin = 5;
 }
 
+/** @brief: Sets LED colour using given signal val
+ * @param colour: IR signal of associated colour
+ * @return: None
+ */
 void Lamp::led_set_col(LedCol_t colour) {
     irsend.sendNEC(colour, 32);
 }
 
+/** @brief: Sets mode using given signal val
+ * @param mode: IR signal of associated mode
+ * @return: None
+ */
 void Lamp::led_mode(LedMode_t mode) {
     irsend.sendNEC(mode, 32);
 }
 
+/** @brief: Checks string to see if it starts with Lamp's zodiac name
+ * @param zodStr: String to be checked
+ * @return: true if Lamp's zodiac; false otherwise
+ */
 bool Lamp::isMyZodiac(std::string zodStr) {
     int isAll, isMine;
     isMine = !(zodStr.compare(0, zodiacs[zodId].name.length(), zodiacs[zodId].name));
@@ -63,6 +80,10 @@ bool Lamp::isMyZodiac(std::string zodStr) {
     return (isMine || isAll);
 }
 
+/** @brief: Sets LED to color mentioned in 'COLOUR-XXXXXXX' command string
+ * @param colCmd: 'COLOUR-XXXXXXX' command string
+ * @return: None
+ */
 void Lamp::process_col(std::string colCmd) {
     std::string col;
 
@@ -72,16 +93,21 @@ void Lamp::process_col(std::string colCmd) {
 
     /* Check each colour */
     for (int i = 0; i < CMD_CNT; i++) {
-        if (col.compare(0, colors[i].col.length(), colors[i].col)) continue;
-        led_set_col(colors[i].irVal);
+        if (col.compare(0, colours[i].col.length(), colours[i].col)) continue; // If different: skip
+        led_set_col(colours[i].irVal);
     }
 
 }
 
+/** @brief: Executes server command
+ * @param rxStr: string received from server
+ * @return: None
+ */
 void Lamp::process_cmd(std::string rxStr) {
 
     // Get rid of zodiac part
     std::string cmd = rxStr.substr(rxStr.find_first_of('-') + 1, rxStr.length());
+
     // Check each command for what it be
     for (int i = 0; i < CMD_CNT; i++) {
         if (cmd.compare(0, commands[i].cmd.length(), commands[i].cmd)) continue; // if they not the same

@@ -7,8 +7,9 @@
 #include "IRremote.h"
 #include "zodiac.h"
 
-#define IR_PIN      5
+#define IR_PIN      5       // Pin to transmit IR from
 
+/* LED Colour IR signals */
 typedef enum LedCol_t {
     LED_RED=0xF720DF,
     LED_GREEN1=0xF7A05F,
@@ -27,6 +28,7 @@ typedef enum LedCol_t {
     LED_PINK=0xF76897,
 } LedCol_t;
 
+/* LED Mode IR signals */
 typedef enum LedMode_t {
     LED_ON=0xF7C03F,
     LED_OFF=0xF740BF,
@@ -43,20 +45,20 @@ class Lamp {
         // Constructor
         Lamp ();
         // Public Variables
-		WiFiClient wfClient;
-        WebSocketClient wsClient;
-		Zodiac_t zodId;
+		WiFiClient wfClient;        // WiFi client
+        WebSocketClient wsClient;   // Web Socket Client
+		Zodiac_t zodId;             // Zodiac ID
         // Public functions
 		void led_set_col(LedCol_t colour);
         void led_mode(LedMode_t mode);
         bool isMyZodiac(std::string zodString);
-        void process_cmd(std::string cmd);
+        void process_cmd(std::string cmd); // Must be full command eg. "OX-XXXX-XXXX"
 
 	private:
         // Private variables
-        IRsend irsend;
+        IRsend irsend;          // Object for sending IR
         // Private functions
-        void process_col(std::string colCmd); // Must include "COLOR"
+        void process_col(std::string colCmd); // Must include "COLOUR-"
 };
 
 
