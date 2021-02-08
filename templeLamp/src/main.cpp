@@ -5,6 +5,10 @@
 #include "zodiac.h"
 #include "lamp.h"
 
+/* Debugging and Setup */
+#define SETUP			0
+#define THIS_ZODIAC		ZOD_OX
+
 /* Defines and Macros */
 #define LINE_STR_SIZE	80
 
@@ -50,17 +54,24 @@ void setup() {
 	EEPROM.begin(1);
 
 	delay(2000);
+
+	/* Zodiac Setup/Check */
+	#if SETUP == 1
+	lamp.zodId = THIS_ZODIAC;
+	EEPROM.write(0, lamp.zodId);
+	EEPROM.commit();
+	Serial.println("Setting zodiac: OX");
+	Serial.println(eepVal);
+	#endif //SETUP
+	
 	// Check EEPROM memory for zodiac
 	if ((eepVal = EEPROM.read(0)) >= ZOD_OX && eepVal <= ZOD_RAT) {
 		lamp.zodId = (Zodiac_t) eepVal;
 		Serial.print("Fetched zodiac: ");
-		Serial.println(eepVal);
+		Serial.println(zodiacs[eepVal].name.c_str());
 	} else {
-		lamp.zodId = ZOD_OX;
-		EEPROM.write(0, lamp.zodId);
-		EEPROM.commit();
-		Serial.println("Setting zodiac: OX");
-		Serial.println(eepVal);
+		Serial.println("Node needs to be initialised");
+		while (true);
 	}
 
 	// Initialisation
@@ -82,7 +93,6 @@ void setup() {
 
 void loop() {
 	std::string recv;
-	char c;
 	bool relevantRx;
 
 	if (status) {
@@ -96,7 +106,6 @@ void loop() {
 			if (lamp.isMyZodiac(recv)) relevantRx = true; // is it our zod?
 			else relevantRx = false;	// no
 		}
-		Serial.println(relevantRx);
 		/* Get command */
 		if (relevantRx) {
 			lamp.process_cmd(recv);
