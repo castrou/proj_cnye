@@ -22,7 +22,7 @@ app.put('/api/:sign/color/:action', (req, res) => {
 	) {
 		res.status(403).send('bad request')
 	} else {
-		wsService.sendZodiacCommand(parsedSign, 'COLOR', parsedAction);
+		wsService.sendZodiacCommand(parsedSign, 'COLOUR', parsedAction);
 		log(`Set ${parsedSign} to ${parsedAction}`)
 		res.status(202).send('ok')
 	}
