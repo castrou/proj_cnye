@@ -68,20 +68,24 @@ void Lamp::process_col(std::string colCmd) {
 
     /* Trim 'COLOR-' command part */
     int tokenPos = colCmd.find_first_of('-', 0);
-    col = colCmd.substr(tokenPos, colCmd.length() - tokenPos);
+    col = colCmd.substr(tokenPos + 1, colCmd.length() - tokenPos);
 
+    /* Check each colour */
     for (int i = 0; i < CMD_CNT; i++) {
-        if (col.compare(0, colors[i].col.length(), colors[i].col)) break;
+        if (col.compare(0, colors[i].col.length(), colors[i].col)) continue;
         led_set_col(colors[i].irVal);
     }
 
 }
 
-void Lamp::process_cmd(std::string cmd) {
+void Lamp::process_cmd(std::string rxStr) {
 
+    // Get rid of zodiac part
+    std::string cmd = rxStr.substr(rxStr.find_first_of('-') + 1, rxStr.length());
+    // Check each command for what it be
     for (int i = 0; i < CMD_CNT; i++) {
-        if (cmd.compare(0, commands[i].cmd.length(), commands[i].cmd)) break;
-        if (commands[i].irVal) led_mode(commands[i].irVal);
+        if (cmd.compare(0, commands[i].cmd.length(), commands[i].cmd)) continue; // if they not the same
+        if (commands[i].irVal) led_mode(commands[i].irVal); // modes have IR values - colors do not
         else process_col(cmd);
     }
 }
