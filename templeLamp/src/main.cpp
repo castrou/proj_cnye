@@ -6,58 +6,32 @@
 #include "lamp.h"
 
 /* Debugging and Setup */
-#define DEBUG			0
-#define SETUP			0
-#define THIS_ZODIAC		ZOD_OX
+#define DEBUG			0			// Enables heartbeat
+#define SETUP			0			// 1: Writes THIS_ZODIAC to EEPROM
+#define THIS_ZODIAC		ZOD_OX		// Zodiac of node to be flashed
 
 /* Defines and Macros */
 #define LINE_STR_SIZE	80
 
-
 /* Global variables */
-int signal = 1;
-int status;
-int eepVal;
+int signal = 0;		// Onboard LED signal
+int status;			// WiFi connection status
+int eepVal;			// EEPROM value
 const char *ssid = "AndroidAP3888";
 const char *pwd = "bpep0558";
-char recv[LINE_STR_SIZE];
 
-IPAddress server(192,168,43,33);
-Lamp lamp;
+IPAddress server(192,168,43,33);	// Socket server IP
+Lamp lamp;						// Object for this lamp
 
-char path[] = "/";
-char host[] = "192.168.43.33";
+char path[] = "/";				// I'm gonna be real idk what this is for
+char host[] = "192.168.43.33";	// Should match server IP
 
 /* Functions */
-std::string client_read(WiFiClient *rxClient) {
-	
-	std::string rx;
-	char c;
-	rx.clear();
-
-	while (rxClient->connected()) {
-		do {
-			c = rxClient->read();
-			if (c == '\0') continue;
-			if (c >= 255) continue;
-			if (c != '\r' && c != '\n' && c < ((int) 32)) continue;
-			rx.push_back(c);
-		} while (c != '\n');
-
-		Serial.print("RECV: ");
-		Serial.println(rx.c_str());
-		break;
-	}
-
-	return rx;
-}
-
 void setup() {
-	// Begin functions
+	/* Initialisation */
 	Serial.begin(9600);
 	EEPROM.begin(1);
-
-	delay(2000);
+	pinMode (LED_BUILTIN, OUTPUT);	
 
 	/* Zodiac Setup/Check */
 	#if SETUP == 1
@@ -66,20 +40,16 @@ void setup() {
 	EEPROM.commit();
 	Serial.print("[EEPROM] Setting zodiac: ");
 	Serial.println(zodiacs[THIS_ZODIAC].name.c_str());
-	#endif //SETUP
-	
+	#endif //SETUP==1
 	// Check EEPROM memory for zodiac
 	if ((eepVal = EEPROM.read(0)) >= ZOD_OX && eepVal <= ZOD_RAT) {
 		lamp.zodId = (Zodiac_t) eepVal;
 		Serial.print("[EEPROM] Fetched zodiac: ");
 		Serial.println(zodiacs[eepVal].name.c_str());
-	} else {
+	} else { // For non-zodiac values
 		Serial.println("[EEPROM] Node needs to be initialised");
-		while (true);
+		while (true); // Hang
 	}
-
-	// Initialisation
-	pinMode (LED_BUILTIN, OUTPUT);			
 	
 	// Connect to wifi
 	while (WiFi.status() != WL_CONNECTED) {
@@ -87,7 +57,6 @@ void setup() {
 		Serial.println("[WiFi] Attempting to connect...");
 		delay(2000);
 	}
-	digitalWrite(LED_BUILTIN, signal);
 	Serial.println("[WiFi] WiFi Connection Established");
 
 	// Connect to web socket server
@@ -110,7 +79,7 @@ void loop() {
 	std::string recv;
 	String buffer;
 	bool relevantRx;
-
+	 /* If connected to WiFi and Web Socket Server */
 	if (status) {
 		// Reset
 		relevantRx = false;
@@ -123,11 +92,14 @@ void loop() {
 		if (buffer.length() > 1) { // Make sure there is data
 			Serial.print("RECV: "); 
 			Serial.println(buffer);
-			recv = buffer.c_str(); // Transfer from String to std::string
+			recv = buffer.c_str(); // Transfer data from String to std::string
 
 			/* Check zodiac */
-			if (!(recv.compare(0, zodiacs[lamp.zodId].name.length(), zodiacs[lamp.zodId].name)))
-				relevantRx = true; // If no difference then relevant
+			if (!(recv.compare(0, zodiacs[lamp.zodId].name.length(), 
+					zodiacs[lamp.zodId].name))) {
+				// If no difference then relevant
+				relevantRx = true;
+			}
 			/* Process command if relevant */
 			if (relevantRx) {
 				Serial.println("Processing command...");
