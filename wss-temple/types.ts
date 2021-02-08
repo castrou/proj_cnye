@@ -14,7 +14,7 @@ export const signs = [
 	'RAT'
 ]
 
-export const commands = [
+export const colors = [
   "RED",
   "GREEN1",
   "BLUE1",
@@ -30,7 +30,8 @@ export const commands = [
   "PURPLE1",
   "PURPLE2",
   "PINK",
-  "COLOR",
+]
+export const modes = [
   "ON",
   "OFF",
   "SPEEDUP",
