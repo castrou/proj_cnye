@@ -2,6 +2,8 @@
 #define LAMP_H
 
 #include <WiFi.h>
+#include <WebSocketClient.h>
+
 #include "IRremote.h"
 #include "zodiac.h"
 
@@ -41,7 +43,8 @@ class Lamp {
         // Constructor
         Lamp ();
         // Public Variables
-		WiFiClient client;
+		WiFiClient wfClient;
+        WebSocketClient wsClient;
 		Zodiac_t zodId;
         // Public functions
 		void led_set_col(LedCol_t colour);

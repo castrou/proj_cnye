@@ -24,6 +24,9 @@ char recv[LINE_STR_SIZE];
 IPAddress server(192,168,43,33);
 Lamp lamp;
 
+char path[] = "/";
+char host[] = "192.168.43.33";
+
 /* Functions */
 std::string client_read(WiFiClient *rxClient) {
 	
@@ -79,20 +82,32 @@ void setup() {
 	
 	// Connect to wifi
 	while (WiFi.status() != WL_CONNECTED) {
-		Serial.println("Attempting to connect...");
 		WiFi.begin(ssid, pwd);
-		delay(500);
+		Serial.println("Attempting to connect...");
+		// delay(500);
 	}
-	
 	digitalWrite(LED_BUILTIN, signal);
 	Serial.println("WiFi Connection Established");
-	if ((status = lamp.client.connect(server, 42069))) {
+
+	// Connect to web socket server
+	if ((status = lamp.wfClient.connect(server, 42069))) {
 		Serial.println("Connected to server");
+		lamp.wsClient.path = path;
+		lamp.wsClient.host = host;
+		/* Try handshake */
+		if (lamp.wsClient.handshake(lamp.wfClient)) {
+			Serial.println("Handshake succesfull");
+			status = 1;
+		} else {
+			Serial.println("Handshake failed");
+			status = 0;
+		}
 	}
 }
 
 void loop() {
 	std::string recv;
+	String buffer;
 	bool relevantRx;
 
 	if (status) {
@@ -101,16 +116,24 @@ void loop() {
 		recv.clear();
 
 		/* Get Zodiac */
-		while (lamp.client.available()) {
-			recv = client_read(&(lamp.client));
-			if (lamp.isMyZodiac(recv)) relevantRx = true; // is it our zod?
-			else relevantRx = false;	// no
+		if (lamp.wfClient.connected()) {
+			lamp.wsClient.getData(buffer);
+			Serial.print("Buffer: ");
+			Serial.println(buffer);
+			recv = buffer.c_str();
 		}
+		// while (lamp.wfClient.available()) {
+		// 	// recv = client_read(&(lamp.client));
+		// 	if (lamp.isMyZodiac(recv)) relevantRx = true; // is it our zod?
+		// 	else relevantRx = false;	// no
+		// }
+
 		/* Get command */
-		if (relevantRx) {
+		if (relevantRx && recv.length() > 1) {
 			lamp.process_cmd(recv);
 		}
 		
+		signal ^= 1;
 		digitalWrite(LED_BUILTIN, signal); // a lil heartbeat so we know it ok (probs delet for final)
 		delay(50);
 	}
