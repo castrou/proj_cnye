@@ -54,7 +54,7 @@ void setup() {
 	if ((eepVal = EEPROM.read(0)) >= ZOD_OX && eepVal <= ZOD_RAT) {
 		lamp.zodId = (Zodiac_t) eepVal;
 		Serial.print("Fetched zodiac: ");
-		Serial.println(eepVal);
+		Serial.println(zodiacs[eepVal].name.c_str());
 	} else {
 		lamp.zodId = ZOD_OX;
 		EEPROM.write(0, lamp.zodId);
@@ -96,7 +96,6 @@ void loop() {
 			if (lamp.isMyZodiac(recv)) relevantRx = true; // is it our zod?
 			else relevantRx = false;	// no
 		}
-		Serial.println(relevantRx);
 		/* Get command */
 		if (relevantRx) {
 			lamp.process_cmd(recv);
