@@ -23,8 +23,11 @@ class SocketHelper {
 	}
 	sendZodiacCommand(zodiac: string, command: string, value: string) {
 		const emitEvent = `${zodiac}-${command}-${value}`;
+		this.emitStringToClients(emitEvent)
+	}
+	emitStringToClients(event: string) {
 		this.clients.forEach(socket => {
-			socket.send(emitEvent)
+			socket.send(event)
 		})
 	}
 }
