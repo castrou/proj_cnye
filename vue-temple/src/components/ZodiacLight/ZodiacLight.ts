@@ -34,11 +34,19 @@ const component = defineComponent({
 				this.lightOn = true;
 			}
 			this.color = color;
-			await apiHelper.sendCommand(this.zodiac.name, this.color)
+			if(this.lightOn) {
+				await apiHelper.sendColor(this.zodiac.name, this.color)
+			} else {
+				await apiHelper.turnOff(this.zodiac.name)
+			}
 		},
 		async toggle() {
 			this.lightOn = !this.lightOn
-			await apiHelper.sendCommand(this.zodiac.name, this.color)
+			if(this.lightOn) {
+				await apiHelper.sendColor(this.zodiac.name, this.color)
+			} else {
+				await apiHelper.turnOff(this.zodiac.name)
+			}
 		},
 		menuToggle() {
 			this.menu = !this.menu
