@@ -33,7 +33,7 @@ Color colors[COL_CNT] = {
 };
 
 Command commands[CMD_CNT] = {
-    {"COLOR",  (LedMode_t) 0},
+    {"COLOUR",  (LedMode_t) 0},
     {"ON",  LED_ON},
     {"OFF",  LED_OFF},
     {"SPEEDUP",  LED_SPEEDUP},
@@ -82,6 +82,7 @@ void Lamp::process_cmd(std::string rxStr) {
 
     // Get rid of zodiac part
     std::string cmd = rxStr.substr(rxStr.find_first_of('-') + 1, rxStr.length());
+    
     // Check each command for what it be
     for (int i = 0; i < CMD_CNT; i++) {
         if (cmd.compare(0, commands[i].cmd.length(), commands[i].cmd)) continue; // if they not the same

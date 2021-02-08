@@ -6,6 +6,7 @@
 #include "lamp.h"
 
 /* Debugging and Setup */
+#define DEBUG			0
 #define SETUP			0
 #define THIS_ZODIAC		ZOD_OX
 
@@ -63,17 +64,17 @@ void setup() {
 	lamp.zodId = THIS_ZODIAC;
 	EEPROM.write(0, lamp.zodId);
 	EEPROM.commit();
-	Serial.println("Setting zodiac: OX");
-	Serial.println(eepVal);
+	Serial.print("[EEPROM] Setting zodiac: ");
+	Serial.println(zodiacs[THIS_ZODIAC].name.c_str());
 	#endif //SETUP
 	
 	// Check EEPROM memory for zodiac
 	if ((eepVal = EEPROM.read(0)) >= ZOD_OX && eepVal <= ZOD_RAT) {
 		lamp.zodId = (Zodiac_t) eepVal;
-		Serial.print("Fetched zodiac: ");
+		Serial.print("[EEPROM] Fetched zodiac: ");
 		Serial.println(zodiacs[eepVal].name.c_str());
 	} else {
-		Serial.println("Node needs to be initialised");
+		Serial.println("[EEPROM] Node needs to be initialised");
 		while (true);
 	}
 
@@ -83,23 +84,23 @@ void setup() {
 	// Connect to wifi
 	while (WiFi.status() != WL_CONNECTED) {
 		WiFi.begin(ssid, pwd);
-		Serial.println("Attempting to connect...");
-		// delay(500);
+		Serial.println("[WiFi] Attempting to connect...");
+		delay(2000);
 	}
 	digitalWrite(LED_BUILTIN, signal);
-	Serial.println("WiFi Connection Established");
+	Serial.println("[WiFi] WiFi Connection Established");
 
 	// Connect to web socket server
 	if ((status = lamp.wfClient.connect(server, 42069))) {
-		Serial.println("Connected to server");
+		Serial.println("[WiFiClient] Connected to server");
 		lamp.wsClient.path = path;
 		lamp.wsClient.host = host;
 		/* Try handshake */
 		if (lamp.wsClient.handshake(lamp.wfClient)) {
-			Serial.println("Handshake succesfull");
+			Serial.println("[WebSocketClient] Handshake succesfull");
 			status = 1;
 		} else {
-			Serial.println("Handshake failed");
+			Serial.println("[WebSocketClient] Handshake failed");
 			status = 0;
 		}
 	}
@@ -114,27 +115,33 @@ void loop() {
 		// Reset
 		relevantRx = false;
 		recv.clear();
-
-		/* Get Zodiac */
+		/* Get Data from Server */
 		if (lamp.wfClient.connected()) {
 			lamp.wsClient.getData(buffer);
-			Serial.print("Buffer: ");
+		}
+		/* Process Data */
+		if (buffer.length() > 1) { // Make sure there is data
+			Serial.print("RECV: "); 
 			Serial.println(buffer);
-			recv = buffer.c_str();
-		}
-		// while (lamp.wfClient.available()) {
-		// 	// recv = client_read(&(lamp.client));
-		// 	if (lamp.isMyZodiac(recv)) relevantRx = true; // is it our zod?
-		// 	else relevantRx = false;	// no
-		// }
+			recv = buffer.c_str(); // Transfer from String to std::string
 
-		/* Get command */
-		if (relevantRx && recv.length() > 1) {
-			lamp.process_cmd(recv);
+			/* Check zodiac */
+			if (!(recv.compare(0, zodiacs[lamp.zodId].name.length(), zodiacs[lamp.zodId].name)))
+				relevantRx = true; // If no difference then relevant
+			/* Process command if relevant */
+			if (relevantRx) {
+				Serial.println("Processing command...");
+				lamp.process_cmd(recv);
+			} else {
+				Serial.println("Ignoring.");
+			}
 		}
-		
+
+		/* Heartbeat */
+		#if DEBUG == 1
 		signal ^= 1;
 		digitalWrite(LED_BUILTIN, signal); // a lil heartbeat so we know it ok (probs delet for final)
+		#endif // DEBUG==1
 		delay(50);
 	}
 
