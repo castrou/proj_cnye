@@ -7,9 +7,11 @@ class SocketHelper {
 		this.ensureInit()
 	}
 	private ensureInit(): WebSocket.Server {
-		this.server = new WebSocket.Server({
-			port: this!.port
-		})
+		if (!this.server) {
+			this.server = new WebSocket.Server({
+				port: this!.port
+			})
+		}
 		this.server.on('connection', (socket: WebSocket) => {
 			socket.on('message', (data: WebSocket.Data) => {
 			})
