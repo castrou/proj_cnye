@@ -16,6 +16,10 @@ class APIHelper {
 		const client = this.ensureInit()
 		return await client.put(`${zodiac}/mode/OFF`)
 	}
+	async turnOn(zodiac: string) {
+		const client = this.ensureInit()
+		return await client.put(`${zodiac}/mode/ON`)
+	}
 	async sendCommand(zodiac: string, action: string) {
 		const client = this.ensureInit()
 		return await client.put(`${zodiac}/${action}`);

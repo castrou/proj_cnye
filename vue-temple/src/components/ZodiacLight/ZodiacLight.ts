@@ -43,7 +43,7 @@ const component = defineComponent({
 		async toggle() {
 			this.lightOn = !this.lightOn
 			if(this.lightOn) {
-				await apiHelper.sendColor(this.zodiac.name, this.color)
+				await apiHelper.turnOn(this.zodiac.name)
 			} else {
 				await apiHelper.turnOff(this.zodiac.name)
 			}
