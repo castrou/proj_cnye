@@ -6,8 +6,8 @@
 #include "lamp.h"
 
 /* Debugging and Setup */
-#define DEBUG			0			// Enables heartbeat
-#define SETUP			0			// 1: Writes THIS_ZODIAC to EEPROM
+#define DEBUG			1			// Enables heartbeat
+#define SETUP			1			// 1: Writes THIS_ZODIAC to EEPROM
 #define THIS_ZODIAC		ZOD_OX		// Zodiac of node to be flashed
 
 /* Defines and Macros */
@@ -17,14 +17,18 @@
 int signal = 0;		// Onboard LED signal
 int status;			// WiFi connection status
 int eepVal;			// EEPROM value
-const char *ssid = "AndroidAP3888";
-const char *pwd = "bpep0558";
+// const char *ssid = "PORTAL@2.4G";
+// const char *pwd = "theW0ngpassword!";
+// const char *ssid = "T5G_4nXx62";
+// const char *pwd = "8547456745";
+const char *ssid = "aaaaa";
+const char *pwd = "11111111";
 
-IPAddress server(192,168,43,33);	// Socket server IP
+IPAddress server(192,168,0,172);	// Socket server IP
 Lamp lamp;						// Object for this lamp
 
 char path[] = "/";				// I'm gonna be real idk what this is for
-char host[] = "192.168.43.33";	// Should match server IP
+char host[] = "192.168.0.172";	// Should match server IP
 
 /* Functions */
 void setup() {
@@ -51,12 +55,14 @@ void setup() {
 		while (true); // Hang
 	}
 	
-	// Connect to wifi
+	WiFi.begin(ssid, pwd);
+
 	while (WiFi.status() != WL_CONNECTED) {
-		WiFi.begin(ssid, pwd);
-		Serial.println("[WiFi] Attempting to connect...");
-		delay(2000);
+		delay(500);
+		Serial.print(".");
 	}
+	signal ^= 1;
+	digitalWrite(LED_BUILTIN, signal); // Static on when Wifi connected
 	Serial.println("[WiFi] WiFi Connection Established");
 
 	// Connect to web socket server
