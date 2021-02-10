@@ -12,21 +12,25 @@ class APIHelper {
 		this.client = Axios.create(config)
 		return this.client
 	}
+
 	async turnOff(zodiac: string) {
 		const client = this.ensureInit()
-		return await client.put(`${zodiac}/mode/OFF`)
+		return await client.put(`/zodiac/${zodiac}/mode/OFF`)
 	}
+
 	async turnOn(zodiac: string) {
 		const client = this.ensureInit()
-		return await client.put(`${zodiac}/mode/ON`)
+		return await client.put(`zodiac/${zodiac}/mode/ON`)
 	}
+
 	async sendCommand(zodiac: string, action: string) {
 		const client = this.ensureInit()
-		return await client.put(`${zodiac}/${action}`);
+		return await client.post(`${zodiac}/${action}`);
 	}
+
 	async sendColor(zodiac: string, color: string) {
 		const client = this.ensureInit()
-		return await client.put(`${zodiac}/color/${color}`)
+		return await client.put(`zodiac/${zodiac}/color/${color}`)
 	}
 }
 export const apiHelper = new APIHelper()
