@@ -1,4 +1,5 @@
 const steps = [
+	'',
 	'RAT-MODE-ON',
 	'OX-MODE-ON',
 	'OX-MODE-OFF',
@@ -62,7 +63,6 @@ export class ListNode<T> {
 let cursor = new ListNode<string>('nothing')
 steps.forEach(step => {
 	const node = new ListNode<string>(step)
-	console.log(node)
 	cursor.setNext(node)
 	cursor = node
 })
