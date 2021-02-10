@@ -7,8 +7,8 @@
 
 /* Debugging and Setup */
 #define DEBUG			1			// Enables heartbeat
-#define SETUP			1			// 1: Writes THIS_ZODIAC to EEPROM
-#define THIS_ZODIAC		ZOD_OX		// Zodiac of node to be flashed
+#define SETUP			0			// 1: Writes THIS_ZODIAC to EEPROM
+#define THIS_ZODIAC		ZOD_PIG		// Zodiac of node to be flashed
 
 /* Defines and Macros */
 #define LINE_STR_SIZE	80
@@ -17,10 +17,6 @@
 int signal = 0;		// Onboard LED signal
 int status;			// WiFi connection status
 int eepVal;			// EEPROM value
-// const char *ssid = "PORTAL@2.4G";
-// const char *pwd = "theW0ngpassword!";
-// const char *ssid = "T5G_4nXx62";
-// const char *pwd = "8547456745";
 const char *ssid = "aaaaa";
 const char *pwd = "11111111";
 
@@ -61,8 +57,8 @@ void setup() {
 		delay(500);
 		Serial.print(".");
 	}
-	signal ^= 1;
-	digitalWrite(LED_BUILTIN, signal); // Static on when Wifi connected
+	// signal ^= 1;
+	// digitalWrite(LED_BUILTIN, signal); // Static on when Wifi connected
 	Serial.println("[WiFi] WiFi Connection Established");
 
 	// Connect to web socket server
@@ -101,11 +97,17 @@ void loop() {
 			recv = buffer.c_str(); // Transfer data from String to std::string
 
 			/* Check zodiac */
-			if (!(recv.compare(0, zodiacs[lamp.zodId].name.length(), 
-					zodiacs[lamp.zodId].name))) {
-				// If no difference then relevant
+			if (!(recv.compare(0, zodiacs[0].name.length(), 
+					zodiacs[0].name))) {
+				//If ALL then relevant
 				relevantRx = true;
 			}
+			else if (!(recv.compare(0, zodiacs[lamp.zodId].name.length(), 
+					zodiacs[lamp.zodId].name))) {
+				// If same zodiac then relevant
+				relevantRx = true;
+			}
+
 			/* Process command if relevant */
 			if (relevantRx) {
 				Serial.println("Processing command...");
