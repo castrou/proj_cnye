@@ -52,9 +52,9 @@ export class ListNode<T> {
 		return !!this.previous
 	}
 	reset() {
-		let cursor: ListNode<T> = this;
-		while(!!cursor.previous){
-			cursor = cursor.previous
+		let cursor: ListNode<T> = this
+		while(!!cursor.previous) {
+			cursor = cursor!.previous
 		}
 		return cursor
 	}
@@ -68,3 +68,48 @@ steps.forEach(step => {
 })
 const head = cursor.reset()
 export default head
+class List {
+	list: string[] = [];
+	stepNumber: number = 0
+	constructor(list: string[]) {
+		this.list = list
+		this.stepNumber = 0
+	}
+	get currentStep() {
+		return this.list[this.stepNumber]
+	}
+	get nextStep() {
+		if(this.stepNumber + 1 < this.list.length ) {
+			return this.list[this.stepNumber + 1]
+		} else {
+			return undefined
+		}
+	}
+	get previousStep() {
+		if(this.stepNumber - 1 >= 0) {
+			return this.list[this.stepNumber - 1]
+		} else {
+			return undefined
+		}
+	}
+	moveForward() {
+		if(this.stepNumber + 1 < this.list.length ) {
+			this.stepNumber++
+			return this.list[this.stepNumber]
+		} else {
+			return undefined
+		}
+	}
+	moveBack() {
+		if(this.stepNumber - 1 >= 0) {
+			this.stepNumber--
+			return this.list[this.stepNumber]
+		} else {
+			return undefined
+		}
+	}
+	reset() {
+		this.stepNumber = 0
+	}
+}
+export const stepList = new List(steps)

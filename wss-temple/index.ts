@@ -4,14 +4,13 @@ import wsService from './ws.service'
 import { signs, colors, modes } from './types'
 import { log } from './utils'
 import { config } from 'dotenv'
-import head, { ListNode } from './steps'
+import { stepList } from './steps'
 
 config()
 
 const app = express()
 const server = createServer(app)
 
-let cursor = head.next;
 
 app.use(express.json())
 
@@ -46,78 +45,86 @@ app.put('/api/:sign/mode/:action', (req, res) => {
 	}
 })
 app.get('/api/step', (req, res) => {
-	if (cursor) {
-		res.status(200).send({ currentStep: cursor.value })
-	} else {
-		res.status(404).send({ message: 'ran out of steps' })
-	}
+	res.status(200).send({
+		prev: stepList.previousStep,
+		currrent: stepList.currentStep,
+		next: stepList.nextStep
+	})
 })
 app.post('/api/step/next', (req, res) => {
-	if (cursor) {
-		if (cursor.next) {
-			const next = cursor.next;
-			cursor = next;
-			res.status(202).send({ currentStep: cursor.value })
-		} else {
-			res.status(404).send({
-				message: 'ran out of steps',
-				currentStep: cursor.value
-			})
-		}
+	if (stepList.moveForward()) {
+		res.status(202).send({
+			prev: stepList.previousStep,
+			current: stepList.currentStep,
+			next: stepList.nextStep
+		})
 	} else {
 		res.status(404).send({
-			message: 'ran out of steps\nPOST api/step/reset to reset state',
+			message: 'ran out of steps',
+			prev: stepList.previousStep,
+			current: stepList.currentStep,
+			next: stepList.nextStep
 		})
 	}
 })
 app.post('/api/step/back', (req, res) => {
-	if (cursor) {
-		if (cursor.previous && cursor.previous.value !== 'nothing') {
-			const prev = cursor.previous;
-			cursor = prev;
-			res.status(202).send({ currentStep: cursor.value })
-		} else {
-			res.status(404).send({
-				message: 'ran out of steps',
-				currentStep: cursor.value
-			})
-		}
+	if (stepList.moveBack()) {
+		res.status(202).send({
+			prev: stepList.previousStep,
+			current: stepList.currentStep,
+			next: stepList.nextStep
+		})
 	} else {
 		res.status(404).send({
-			message: 'ran out of steps\nPOST api/step/reset to reset state',
+			message: 'ran out of steps',
+			prev: stepList.previousStep,
+			current: stepList.currentStep,
+			next: stepList.nextStep
 		})
 	}
 })
 app.post('/api/step/reset', (req, res) => {
-	if(cursor) {
-		cursor = cursor.reset().next
-		res.status(205)
-	} else {
-		res.status(500).send({ message: 'uWu i did a fucky' })
-	}
+	stepList.reset()
+	res.status(205).send({
+		message: "reset",
+		prev: stepList.previousStep,
+		current: stepList.currentStep,
+		next: stepList.nextStep
+	})
 })
 app.put('/api/step/execute', (req, res) => {
-	if(cursor) {
-		const commandStr = cursor.value
-		const commands = commandStr.split(' ');
-		commands.forEach(command => {
-			wsService.emitStringToClients(command)
-		})
-		res.status(200).send({ message: 'executed', currentStep: cursor.value })
-	} else {
-		res.status(501).send({ message: 'no step to execute'})
-	}
+	const commandStr = stepList.currentStep
+	const commands = commandStr.split(' ');
+	commands.forEach(command => {
+		wsService.emitStringToClients(command)
+	})
+	res.status(200).send({
+		message: 'executed',
+		prev: stepList.previousStep,
+		current: stepList.currentStep,
+		next: stepList.nextStep
+	})
 })
-app.post('/api/step/executeNext', (req, res) => {
-	if(cursor) {
-		const commandStr = cursor.value
-		const commands = commandStr.split(' ');
-		commands.forEach(command => {
-			wsService.emitStringToClients(command)
+app.post('/api/step/executeAndNext', (req, res) => {
+	const commandStr = stepList.currentStep
+	const commands = commandStr.split(' ');
+	commands.forEach(command => {
+		wsService.emitStringToClients(command)
+	})
+	if (stepList.moveForward()) {
+		res.status(200).send({
+			message: 'executed',
+			prev: stepList.previousStep,
+			current: stepList.currentStep,
+			next: stepList.nextStep
 		})
-		res.status(200).send({ message: 'executed', currentStep: cursor.value })
 	} else {
-		res.status(501).send({ message: 'no step to execute'})
+		res.status(404).send({
+			message: 'ran out of steps',
+			prev: stepList.previousStep,
+			current: stepList.currentStep,
+			next: stepList.nextStep
+		})
 	}
 })
 
