@@ -57,8 +57,8 @@ void setup() {
 		delay(500);
 		Serial.print(".");
 	}
-	// signal ^= 1;
-	// digitalWrite(LED_BUILTIN, signal); // Static on when Wifi connected
+	signal ^= 1;
+	digitalWrite(LED_BUILTIN, signal); // Static on when Wifi connected
 	Serial.println("[WiFi] WiFi Connection Established");
 
 	// Connect to web socket server
