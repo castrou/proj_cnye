@@ -42,6 +42,7 @@ const component = defineComponent({
 		const lightOnClassList = computed(() => {
 			return makeClassList(lightOn.value)
 		})
+
 		const fadeClassList = computed(() => {
 			return makeClassList(fade.value)
 		})

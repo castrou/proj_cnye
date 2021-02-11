@@ -6,7 +6,7 @@ export default defineComponent({
 		const currentStep = ref('')
 		const nextStep = ref('')
 		const isLoading = ref(false)
-		const updateValues = (data) => {
+		const updateValues = (data: { prev: string, current: string, next: string}) => {
 			previousStep.value = data.prev || ''
 			currentStep.value = data.current || ''
 			nextStep.value = data.next || ''
@@ -22,6 +22,8 @@ export default defineComponent({
 			updateValues,
 			isLoading
 		}
+	},
+	data() {
 	},
 	computed: {
 		hasPrev() { return !!this.previousStep },
