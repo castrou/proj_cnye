@@ -96,6 +96,12 @@ app.post('/api/ALL/ON', (req, res) => {
     message: "ALL-ON"
   })
 })
+app.post('/api/ALL/FADE', (req, res) => {
+  wsService.emitStringToClients('ALL-MODE-FADE')
+  res.status(205).send({
+    message: "ALL-FADE"
+  })
+})
 
 app.post('/api/step/reset', (req, res) => {
   stepList.reset()

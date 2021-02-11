@@ -5,6 +5,7 @@
   .flex.space-x-2.mx-auto(class="min-w-3/6")
     button.rounded-sm.bg-gray-50.flex-1(@click.prevent="allOn") All On
     button.rounded-sm.bg-gray-50.flex-1(@click.prevent="allOff") All Off
+    button.rounded-sm.bg-gray-50.flex-1(@click.prevent="allFade") All Fade
   .flex.flex-col.space-y-2.mx-auto(class="min-w-3/6")
     ZodiacLight(
     v-for="(zodiac, index) in zodiacs" 
@@ -40,6 +41,9 @@ export default defineComponent({
     allOff(){
       apiHelper.sendCommand('ALL', 'OFF')
     },
+    allFade( ){
+      apiHelper.sendCommand('ALL', 'FADE')
+    }
   }
 })
 </script>

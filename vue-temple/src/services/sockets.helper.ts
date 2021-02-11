@@ -2,6 +2,7 @@ export interface EventHandlerSet {
 	turnOff: Function,
 	turnOn: Function,
 	setColor: Function,
+	fadeOn: Function
 }
 class WSHelper {
 	client?: WebSocket
@@ -20,7 +21,6 @@ class WSHelper {
 		return this.client
 	}
 	public registerEvent(zodiac: string, handlers: EventHandlerSet) {
-		console.log('registering', zodiac)
 		this.ensureInit()
 		this.regsiteredHandlers[zodiac] = handlers
 	}
@@ -38,10 +38,15 @@ class WSHelper {
 		if(command === 'COLOUR') {
 			this.regsiteredHandlers[zodiac].setColor(value)
 		} else {
-			if(value === 'ON') {
-				this.regsiteredHandlers[zodiac].turnOn()
-			} else {
-				this.regsiteredHandlers[zodiac].turnOff()
+			switch(value) {
+				case 'ON': 
+					this.regsiteredHandlers[zodiac].turnOn()
+					break;
+				case 'OFF': 
+					this.regsiteredHandlers[zodiac].turnOff()
+					break;
+				case 'FADE': 
+					this.regsiteredHandlers[zodiac].fadeOn()
 			}
 		}
 	}
