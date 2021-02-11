@@ -38,14 +38,14 @@ Colour colours[COL_CNT] = {
 /* List of command pairs */
 Command commands[CMD_CNT] = {
     {"COLOUR",  (LedMode_t) 0},
-    {"ON",  LED_ON},
-    {"OFF",  LED_OFF},
-    {"SPEEDUP",  LED_SPEEDUP},
-    {"SPEEDDOWN",  LED_SPEEDDOWN},
-    {"FLASH",  LED_FLASH},
-    {"STROBE",  LED_STROBE},
-    {"FADE",  LED_FADE},
-    {"SMOOTH",  LED_SMOOTH},
+    {"MODE-ON",  LED_ON},
+    {"MODE-OFF",  LED_OFF},
+    {"MODE-SPEEDUP",  LED_SPEEDUP},
+    {"MODE-SPEEDDOWN",  LED_SPEEDDOWN},
+    {"MODE-FLASH",  LED_FLASH},
+    {"MODE-STROBE",  LED_STROBE},
+    {"MODE-FADE",  LED_FADE},
+    {"MODE-SMOOTH",  LED_SMOOTH},
 };
 
 /* Lamp object constructor */
@@ -92,7 +92,7 @@ void Lamp::process_col(std::string colCmd) {
     col = colCmd.substr(tokenPos + 1, colCmd.length() - tokenPos);
 
     /* Check each colour */
-    for (int i = 0; i < CMD_CNT; i++) {
+    for (int i = 0; i < COL_CNT; i++) {
         if (col.compare(0, colours[i].col.length(), colours[i].col)) continue; // If different: skip
         led_set_col(colours[i].irVal);
     }
